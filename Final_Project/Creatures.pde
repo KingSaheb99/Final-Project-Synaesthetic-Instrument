@@ -1,3 +1,4 @@
+//Flocking Example
 
 class Creature 
 {
@@ -5,221 +6,234 @@ class Creature
   PVector position;
   PVector velocity;
   PVector acceleration;
-  float r = 2.0;
-  float maxforce = 0.03;    
-  float maxspeed = 2;   
+  PVector desired;
+  PVector target;
+  float size = 10.0;
+  float maxForce = 0.03;    
+  float maxSpeed = 3;   
 
   Creature(float x, float y) 
   {
+    position = new PVector(x, y);
+    
     acceleration = new PVector(0, 0);
 
     float angle = random(TWO_PI);
     
     velocity = new PVector(cos(angle), sin(angle));
-
-    position = new PVector(x, y);
-    
   }
 
   void run(ArrayList<Creature> creatures) 
   {
-    flock(creatures);
-    update();
-    borders();
-    render();
+    group(creatures);
+    update(creatures);
+    screenEdge();
+    draw();
   }
 
   void applyForce(PVector force) 
   {
-    // We could add mass here if we want A = F / M
     acceleration.add(force);
   }
 
-  // We accumulate a new acceleration each time based on three rules
-  void flock(ArrayList<Creature> creatures) 
+  void group(ArrayList<Creature> creatures) 
   {
-    PVector sep = separate(creatures);   // Separation
-    PVector ali = align(creatures);      // Alignment
-    PVector coh = cohesion(creatures);   // Cohesion
-    // Arbitrarily weight these forces
-    sep.mult(1.5);
-    ali.mult(1.0);
-    coh.mult(1.0);
-    // Add the force vectors to acceleration
-    applyForce(sep);
-    applyForce(ali);
-    applyForce(coh);
+    PVector seperation = separate(creatures);   
+    PVector alignment = align(creatures);      
+    PVector cohesion = cohesion(creatures);   
+    
+    seperation.mult(1.5); //Arbitrary values 
+    alignment.mult(1.0);
+    cohesion.mult(1.0);
+
+    applyForce(seperation);
+    applyForce(alignment);
+    applyForce(cohesion);
   }
 
-  // Method to update position
-  void update() 
+  void update(ArrayList<Creature> creatures) 
   {
-    // Update velocity
     velocity.add(acceleration);
-    // Limit speed
-    velocity.limit(maxspeed);
+    
+    velocity.limit(maxSpeed); //Speed limit
+    
     position.add(velocity);
-    // Reset accelertion to 0 each cycle
-    acceleration.mult(0);
+
+    acceleration.mult(0); //Resets acceleration 
+    
+    if(mousePressed == true)
+    
+      for (Creature creature : creatures)
+      {
+        creature.desired = mousePos;
+        creature.target = mousePos;
+        creature.maxForce = 0.05;
+        
+      }
+    else
+      {
+        for (Creature creature : creatures)
+        {
+          creature.maxForce = 0.03;
+        }
+      }
   }
 
-  // A method that calculates and applies a steering force towards a target
-  // STEER = DESIRED MINUS VELOCITY
-  PVector seek(PVector target) 
+  void draw() 
   {
-    PVector desired = PVector.sub(target, position);  // A vector pointing from the position to the target
-    // Scale to maximum speed
-    desired.normalize();
-    desired.mult(maxspeed);
-
-    // Above two lines of code below could be condensed with new PVector setMag() method
-    // Not using this method until Processing.js catches up
-    // desired.setMag(maxspeed);
-
-    // Steering = Desired minus Velocity
-    PVector steer = PVector.sub(desired, velocity);
-    steer.limit(maxforce);  // Limit to maximum steering force
-    return steer;
-  }
-
-  void render() 
-  {
-    // Draw a triangle rotated in the direction of velocity
-    float theta = velocity.heading2D() + radians(90);
-    // heading2D() above is now heading() but leaving old syntax until Processing.js catches up
+    float theta = velocity.heading() + radians(90);
     
     fill(200, 100);
     stroke(255);
+    
     pushMatrix();
+    
     translate(position.x, position.y);
     rotate(theta);
     beginShape(TRIANGLES);
-    vertex(0, -r*2);
-    vertex(-r, r*2);
-    vertex(r, r*2);
+    vertex(0, -size * 2);
+    vertex(-size, size * 2);
+    vertex(size, size * 2);
     endShape();
+    
     popMatrix();
   }
 
-  // Wraparound
-  void borders() 
+  void screenEdge() //Move across edges
   {
-    if (position.x < -r) position.x = width+r;
-    if (position.y < -r) position.y = height+r;
-    if (position.x > width+r) position.x = -r;
-    if (position.y > height+r) position.y = -r;
+    if (position.x < -size) 
+    {
+      position.x = width + size;
+    }
+    if (position.y < -size) 
+    {
+      position.y = height + size;
+    }
+    if (position.x > width + size) 
+    {
+      position.x = -size;
+    }
+    if (position.y > height + size) 
+    {
+      position.y = -size;
+    }
   }
-
-  // Separation
-  // Method checks for nearby boids and steers away
-  PVector separate (ArrayList<Creature> creatures) 
-  {
-    float desiredseparation = 25.0f;
-    PVector steer = new PVector(0, 0, 0);
-    int count = 0;
-    // For every boid in the system, check if it's too close
-    for (Creature other : creatures) 
+  
+    PVector move(PVector target) 
     {
-      float d = PVector.dist(position, other.position);
-      // If the distance is greater than 0 and less than an arbitrary amount (0 when you are yourself)
-      if ((d > 0) && (d < desiredseparation)) 
-      {
-        // Calculate vector pointing away from neighbor
-        PVector diff = PVector.sub(position, other.position);
-        diff.normalize();
-        diff.div(d);        // Weight by distance
-        steer.add(diff);
-        count++;            // Keep track of how many
-      }
-    }
-    // Average -- divide by how many
-    if (count > 0) 
-    {
-      steer.div((float)count);
-    }
-
-    // As long as the vector is greater than 0
-    if (steer.mag() > 0) 
-    {
-      // First two lines of code below could be condensed with new PVector setMag() method
-      // Not using this method until Processing.js catches up
-      // steer.setMag(maxspeed);
-
-      // Implement Reynolds: Steering = Desired - Velocity
-      steer.normalize();
-      steer.mult(maxspeed);
-      steer.sub(velocity);
-      steer.limit(maxforce);
-    }
-    
-    return steer;
-  }
-
-  // Alignment
-  // For every nearby boid in the system, calculate the average velocity
-  PVector align (ArrayList<Creature> creatures) 
-  {
-    float neighbordist = 50;
-    PVector sum = new PVector(0, 0);
-    int count = 0;
-    for (Creature other : creatures) 
-    {
-      float d = PVector.dist(position, other.position);
+      desired = PVector.sub(target, position);  
       
-      if ((d > 0) && (d < neighbordist)) 
-      {
-        sum.add(other.velocity);
-        count++;
-      }
-    }
-    
-    if (count > 0) 
-    {
-      sum.div((float)count);
-      // First two lines of code below could be condensed with new PVector setMag() method
-      // Not using this method until Processing.js catches up
-      // sum.setMag(maxspeed);
-
-      // Implement Reynolds: Steering = Desired - Velocity
-      sum.normalize();
-      sum.mult(maxspeed);
-      PVector steer = PVector.sub(sum, velocity);
-      steer.limit(maxforce);
+      desired.normalize();
+      desired.mult(maxSpeed);
+  
+      PVector steer = PVector.sub(desired, velocity);
+      
+      steer.limit(maxForce);  
+      
       return steer;
-    } 
-    else 
-    {
-      return new PVector(0, 0);
     }
-  }
-
-  // Cohesion
-  // For the average position (i.e. center) of all nearby boids, calculate steering vector towards that position
-  PVector cohesion (ArrayList<Creature> creatures) 
-  {
-    float neighbordist = 50;
-    PVector sum = new PVector(0, 0);   // Start with empty vector to accumulate all positions
-    int count = 0;
-    
-    for (Creature other : creatures) 
+  
+    PVector separate (ArrayList<Creature> creatures) 
     {
-      float d = PVector.dist(position, other.position);
-      
-      if ((d > 0) && (d < neighbordist)) 
+      float desiredSeparation = 25.0;
+      PVector steer = new PVector(0, 0, 0);
+      int count = 0;
+  
+      for (Creature nearbyCreature : creatures) 
       {
-        sum.add(other.position); // Add position
-        count++;
+        float currentSeperation = PVector.dist(position, nearbyCreature.position);
+  
+        if (currentSeperation > 0 && currentSeperation < desiredSeparation) 
+        {
+          PVector seperationDifference = PVector.sub(position, nearbyCreature.position);
+          
+          seperationDifference.normalize();
+          seperationDifference.div(currentSeperation);        
+          
+          steer.add(seperationDifference);
+          
+          count++;
+        }
+      }
+  
+      if (count > 0) 
+      {
+        steer.div((float)count); //If near more than one other creature
+      }
+  
+      if (steer.mag() > 0) 
+      {
+        steer.setMag(maxSpeed);
+        steer.sub(velocity);
+        steer.limit(maxForce);
+      }
+      
+      return steer;
+    }
+  
+    PVector align (ArrayList<Creature> creatures) 
+    {
+      float neighborDist = 50;
+      PVector sum = new PVector(0, 0);
+      int count = 0;
+      
+      for (Creature nearbyCreature : creatures) 
+      {
+        float currentSeperation = PVector.dist(position, nearbyCreature.position);
+        
+        if (currentSeperation > 0 && currentSeperation < neighborDist) 
+        {
+          sum.add(nearbyCreature.velocity);
+          
+          count++;
+        }
+      }
+      
+      if (count > 0) 
+      {
+        sum.div((float)count); //If near more than one other creature
+        
+        sum.setMag(maxSpeed);
+        
+        PVector steer = PVector.sub(sum, velocity);
+        
+        steer.limit(maxForce);
+        
+        return steer;
+      } 
+      else 
+      {
+        return new PVector(0, 0);
       }
     }
-    
-    if (count > 0) 
+  
+    PVector cohesion (ArrayList<Creature> creatures) 
     {
-      sum.div(count);
-      return seek(sum);  // Steer towards the position
-    } 
-    else 
-    {
-      return new PVector(0, 0);
+      float neighborDist = 50;
+      PVector sum = new PVector(0, 0);
+      int count = 0;
+      
+      for (Creature nearbyCreature : creatures) 
+      {
+        float currentSeperation = PVector.dist(position, nearbyCreature.position);
+        
+        if (currentSeperation > 0 && currentSeperation < neighborDist) 
+        {
+          sum.add(nearbyCreature.position); 
+          
+          count++;
+        }
+      }
+      
+      if (count > 0) 
+      {
+        sum.div(count); //If near more than one other creature
+        
+        return move(sum);  
+      } 
+      else 
+      {
+        return new PVector(0, 0);
+      }
     }
   }
-}
