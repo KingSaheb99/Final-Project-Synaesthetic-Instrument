@@ -37,6 +37,10 @@ class Creature
     {
       counter_balance = counter_balance + 1;
     }
+    else if(affect == 3)
+    {
+      counter_gain = counter_gain + 1;
+    }
   }
 
   void run(ArrayList<Creature> creatures) 

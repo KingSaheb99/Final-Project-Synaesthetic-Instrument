@@ -9,7 +9,8 @@ class Group
   float avgPositionY_bandPass = 0;
   
   float avgPositionX_balance = 0;
-  float avgPositionY_balance = 0;
+  
+  float avgPositionY_gain = 0;
 
   Group() 
   {
@@ -35,8 +36,13 @@ class Group
         avgPositionX_balance = (avgPositionX_balance + creature.position.x)/counter_balance;
         avgPositionX_balance = constrain(avgPositionX_balance, 0, 5);
       }
+      else if(creature.affect == 3)
+      {
+        avgPositionY_gain = (avgPositionY_gain + creature.position.y)/counter_gain;
+        avgPositionY_gain = constrain(avgPositionY_gain, 0, 5);
+      }
     }
-    println(avgPositionX_balance);
+    println(avgPositionY_gain);
   }
 
   void addCreature(Creature creature) 

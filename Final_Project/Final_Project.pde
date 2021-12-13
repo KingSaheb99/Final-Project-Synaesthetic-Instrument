@@ -16,6 +16,7 @@ PVector mousePos;
 
 int counter_bandPass = 0;
 int counter_balance = 0;
+int counter_gain = 0;
 
 void setup() 
 {
@@ -37,6 +38,8 @@ void setup()
   {
     group.addCreature(new Creature(random(0 + width/4, width - width/4), random(0 + height/4, height - height/4), int(random(1, 4))));
   }
+  
+  textFont(createFont("Arial", 12));
 }
 
 void draw() 
