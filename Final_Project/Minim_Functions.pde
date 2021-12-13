@@ -8,7 +8,7 @@ BeatDetect beatDetector;
 
 void minimFunctions()
 {
-  beatDetector.detect(player2.mix);
+  beatDetector.detect(currentPlayer2.mix);
   if(beatDetector.isOnset())
   {
     ellipse(width/2, height/2, width/2, height/2);
