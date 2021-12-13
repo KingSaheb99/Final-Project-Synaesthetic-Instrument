@@ -15,9 +15,9 @@ void minimFunctions()
   for (int i = 0; i < output.bufferSize()-1; i++)
   {
     float x1 = map(i, 0, output.bufferSize(), 0, width);
-    float x2 = map(i+1, 0, output.bufferSize(), 0, width);
-    line(x1, height/4 - output.left.get(i)*50, x2, height/4 - output.left.get(i+1)*50);
-    line(x1, 3*height/4 - output.right.get(i)*50, x2, 3*height/4 - output.right.get(i+1)*50);
+    float x2 = map(i + 1, 0, output.bufferSize(), 0, width);
+    line(x1, height/4 - output.left.get(i) * 50, x2, height/4 - output.left.get(i + 1) * 50);
+    line(x1, height/4 * 3 - output.right.get(i) * 50, x2, height/4 * 3 - output.right.get(i + 1) * 50);
   }
   
   if(output.hasControl(Controller.BALANCE))
