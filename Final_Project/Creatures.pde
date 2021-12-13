@@ -7,10 +7,14 @@ class Creature
   PVector velocity;
   PVector acceleration;
   PVector desired;
+  PVector seperation;
+  PVector alignment;
+  PVector cohesion;
   PVector target;
   float size = 10.0;
   float maxForce = 0.03;    
-  float maxSpeed = 3;   
+  float maxSpeed = 3; 
+  boolean normalMovement = true;
 
   Creature(float x, float y) 
   {
@@ -38,10 +42,10 @@ class Creature
 
   void group(ArrayList<Creature> creatures) 
   {
-    PVector seperation = separate(creatures);   
-    PVector alignment = align(creatures);      
-    PVector cohesion = cohesion(creatures);   
-    
+    alignment = align(creatures);      
+    cohesion = cohesion(creatures);
+    seperation = separate(creatures);   
+        
     seperation.mult(1.5); //Arbitrary values 
     alignment.mult(1.0);
     cohesion.mult(1.0);
@@ -62,21 +66,18 @@ class Creature
     acceleration.mult(0); //Resets acceleration 
     
     if(mousePressed == true)
-    
-      for (Creature creature : creatures)
-      {
-        creature.desired = mousePos;
-        creature.target = mousePos;
-        creature.maxForce = 0.05;
-        
-      }
+    {
+      normalMovement = false;
+    }
     else
-      {
-        for (Creature creature : creatures)
-        {
-          creature.maxForce = 0.03;
-        }
-      }
+    {
+      normalMovement = true;
+    }
+    
+    if(normalMovement == false)
+    {
+      target = mousePos;
+    }
   }
 
   void draw() 
@@ -121,15 +122,26 @@ class Creature
   
     PVector move(PVector target) 
     {
-      desired = PVector.sub(target, position);  
-      
+      if(normalMovement == true)
+      {
+        desired = PVector.sub(target, position);
+        maxForce = 0.03;
+      }
+      else
+      {
+        target = mousePos;
+        desired = PVector.sub(target, position);
+        maxForce = 0.10;
+      }
+        
       desired.normalize();
       desired.mult(maxSpeed);
-  
+        
+    
       PVector steer = PVector.sub(desired, velocity);
-      
+        
       steer.limit(maxForce);  
-      
+        
       return steer;
     }
   
@@ -138,36 +150,38 @@ class Creature
       float desiredSeparation = 25.0;
       PVector steer = new PVector(0, 0, 0);
       int count = 0;
-  
-      for (Creature nearbyCreature : creatures) 
-      {
-        float currentSeperation = PVector.dist(position, nearbyCreature.position);
-  
-        if (currentSeperation > 0 && currentSeperation < desiredSeparation) 
-        {
-          PVector seperationDifference = PVector.sub(position, nearbyCreature.position);
-          
-          seperationDifference.normalize();
-          seperationDifference.div(currentSeperation);        
-          
-          steer.add(seperationDifference);
-          
-          count++;
-        }
-      }
-  
-      if (count > 0) 
-      {
-        steer.div((float)count); //If near more than one other creature
-      }
-  
-      if (steer.mag() > 0) 
-      {
-        steer.setMag(maxSpeed);
-        steer.sub(velocity);
-        steer.limit(maxForce);
-      }
       
+      //if(normalMovement == true)
+      //{
+        for (Creature nearbyCreature : creatures) 
+        {
+          float currentSeperation = PVector.dist(position, nearbyCreature.position);
+    
+          if (currentSeperation > 0 && currentSeperation < desiredSeparation) 
+          {
+            PVector seperationDifference = PVector.sub(position, nearbyCreature.position);
+            
+            seperationDifference.normalize();
+            seperationDifference.div(currentSeperation);        
+            
+            steer.add(seperationDifference);
+            
+            count++;
+          }
+        }
+    
+        if (count > 0) 
+        {
+          steer.div((float)count); //If near more than one other creature
+        }
+    
+        if (steer.mag() > 0) 
+        {
+          steer.setMag(maxSpeed);
+          steer.sub(velocity);
+          steer.limit(maxForce);
+        }
+      //}
       return steer;
     }
   
@@ -177,17 +191,20 @@ class Creature
       PVector sum = new PVector(0, 0);
       int count = 0;
       
-      for (Creature nearbyCreature : creatures) 
-      {
-        float currentSeperation = PVector.dist(position, nearbyCreature.position);
-        
-        if (currentSeperation > 0 && currentSeperation < neighborDist) 
+      //if(normalMovement == true)
+      //{
+        for (Creature nearbyCreature : creatures) 
         {
-          sum.add(nearbyCreature.velocity);
+          float currentSeperation = PVector.dist(position, nearbyCreature.position);
           
-          count++;
+          if (currentSeperation > 0 && currentSeperation < neighborDist) 
+          {
+            sum.add(nearbyCreature.velocity);
+            
+            count++;
+          }
         }
-      }
+      //}
       
       if (count > 0) 
       {
@@ -213,17 +230,20 @@ class Creature
       PVector sum = new PVector(0, 0);
       int count = 0;
       
-      for (Creature nearbyCreature : creatures) 
-      {
-        float currentSeperation = PVector.dist(position, nearbyCreature.position);
-        
-        if (currentSeperation > 0 && currentSeperation < neighborDist) 
+      //if(normalMovement == true)
+      //{
+        for (Creature nearbyCreature : creatures) 
         {
-          sum.add(nearbyCreature.position); 
+          float currentSeperation = PVector.dist(position, nearbyCreature.position);
           
-          count++;
+          if (currentSeperation > 0 && currentSeperation < neighborDist) 
+          {
+            sum.add(nearbyCreature.position); 
+            
+            count++;
+          }
         }
-      }
+      //}
       
       if (count > 0) 
       {
