@@ -42,7 +42,6 @@ class Group
         avgPositionY_gain = constrain(avgPositionY_gain, 0, 5);
       }
     }
-    println(avgPositionY_gain);
   }
 
   void addCreature(Creature creature) 

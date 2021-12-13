@@ -6,15 +6,20 @@ class Creature
   PVector position;
   PVector velocity;
   PVector acceleration;
+  
   PVector desired;
   PVector seperation;
   PVector alignment;
   PVector cohesion;
   PVector target;
+  
   float size = 10.0;
+  
   float maxForce = 0.03;    
-  float maxSpeed = 3; 
+  float maxSpeed = 3;
+  
   int affect;
+  
   boolean normalMovement = true;
 
   Creature(float x, float y, int tempAffect) 
@@ -46,7 +51,7 @@ class Creature
   void run(ArrayList<Creature> creatures) 
   {
     group(creatures);
-    update();
+    update(creatures);
     screenEdge();
     draw();
   }
@@ -71,7 +76,7 @@ class Creature
     applyForce(cohesion);
   }
 
-  void update() 
+  void update(ArrayList<Creature> creatures) 
   {
     velocity.add(acceleration);
     
@@ -100,8 +105,8 @@ class Creature
   {
     float theta = velocity.heading() + radians(90);
     
-    fill(200, 100);
-    stroke(255);
+    //fill(200, 100);
+    //stroke(255);
     
     pushMatrix();
     

@@ -2,12 +2,28 @@
 //Minim getSetBalance
 //Minim getSetGain
 //Minim FrequencyEnergyBeatDetection
+//Minim SoundEnergyBeatDetection
 
 BeatDetect beatDetector;
-int rectTimeout = 0;
 
 void minimFunctions()
 {
+  beatDetector.detect(player2.mix);
+  if(beatDetector.isOnset())
+  {
+    ellipse(width/2, height/2, width/2, height/2);
+    
+    fill(0, 100);
+    stroke(0);
+    bgColor = 255;
+  }
+  else
+  {
+    fill(200, 100);
+    stroke(255);
+    bgColor = 0;
+  }
+  
   float passBand = map(group.avgPositionX_bandPass, 1, 8, 1000, 10000);
   bandPass.setFreq(passBand);
   text("BandPass: " + passBand, 5, 15);
@@ -37,22 +53,6 @@ void minimFunctions()
     output.setGain(gain);
     text("Gain: " + output.getGain(), 5, 60);
   }
-  
-  float rectW = width / beatDetector.detectSize();
-  for(int i = 0; i < beatDetector.detectSize(); ++i)
-  {
-    // test one frequency band for an onset
-    if ( beatDetector.isOnset(i)) //&& millis() > rectTimeout)
-    {
-      //rectMode(CENTER);
-      //fill(0,200,0);
-      //rect(width/2, height/2, width/2, height/2);
-      
-      //rectTimeout = millis() + rectTimeout;
-    }
-  }
-  
-  
 }
 
 class BeatListener implements AudioListener

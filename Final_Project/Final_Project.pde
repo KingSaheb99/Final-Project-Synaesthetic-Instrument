@@ -7,6 +7,7 @@ import ddf.minim.ugens.*;
 import ddf.minim.*;
 import ddf.minim.analysis.*;
 
+
 Minim minim;
 AudioOutput output;
 FilePlayer player;
@@ -22,6 +23,8 @@ int counter_bandPass = 0;
 int counter_balance = 0;
 int counter_gain = 0;
 
+int bgColor = 0;
+
 void setup() 
 {
   size(1280, 800, P2D);
@@ -30,7 +33,7 @@ void setup()
   output = minim.getLineOut(Minim.STEREO, 1024);
   
   player = new FilePlayer(minim.loadFileStream("Le KAISER Has Arrived.mp3"));
-  player2 = minim.loadFile("Le KAISER Has Arrived.mp3", 1024);
+  player2 = minim.loadFile("Le KAISER Has Arrived.mp3", 2048);
   
   bandPass = new BandPass(440, 400, output.sampleRate());
   
@@ -40,8 +43,7 @@ void setup()
   player2.loop();
   player2.mute();
   
-  beatDetector = new BeatDetect(player2.bufferSize(), player2.sampleRate());
-  beatDetector.setSensitivity(750);
+  beatDetector = new BeatDetect();
   
   beatListener = new BeatListener(beatDetector, player2);
     
@@ -53,15 +55,16 @@ void setup()
   }
   
   textFont(createFont("Arial", 12));
+  
 }
 
 void draw() 
 {
-  background(50);
-    
+  background(bgColor);
+  
   group.run();
   minimFunctions();
-  
+    
   mousePos = new PVector(mouseX, mouseY);
   
   surface.setTitle("" + frameRate);
