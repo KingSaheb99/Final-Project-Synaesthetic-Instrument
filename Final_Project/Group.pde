@@ -6,6 +6,7 @@ class Group
   
   int counter = 0;
   float avgPositionX = 0;
+  float avgPositionY = 0;
 
   Group() 
   {
@@ -20,9 +21,14 @@ class Group
       
       if(creature.affect == 1)
       {
-        avgPositionX = avgPositionX + creature.position.x;
+        avgPositionX = (avgPositionX + creature.position.x)/passCounter;
+        avgPositionX = constrain(avgPositionX, 1, 3);
+        
+        avgPositionY = (avgPositionY + creature.position.y)/passCounter;
+        avgPositionY = constrain(avgPositionY, 1, 3);
       }
     }
+    println(avgPositionX);
   }
 
   void addCreature(Creature creature) 

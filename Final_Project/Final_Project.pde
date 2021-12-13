@@ -14,6 +14,8 @@ Group group;
 
 PVector mousePos;
 
+int passCounter = 0;
+
 void setup() 
 {
   size(1280, 800, P2D);
@@ -49,6 +51,7 @@ void draw()
   }
     
   group.run();
+  BandPassFunctions();
   
   mousePos = new PVector(mouseX, mouseY);
   

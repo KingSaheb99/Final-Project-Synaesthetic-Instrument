@@ -28,6 +28,11 @@ class Creature
     velocity = new PVector(cos(angle), sin(angle));
     
     affect = tempAffect;
+    
+    if(affect == 1)
+    {
+      passCounter = passCounter + 1;
+    }
   }
 
   void run(ArrayList<Creature> creatures) 
