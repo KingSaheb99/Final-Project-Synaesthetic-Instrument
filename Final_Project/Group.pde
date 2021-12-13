@@ -2,23 +2,31 @@
 
 class Group 
 {
-  ArrayList<Creature> creatures; // An ArrayList for all the boids
+  ArrayList<Creature> creatures; 
+  
+  int counter = 0;
+  float avgPositionX = 0;
 
   Group() 
   {
-    creatures = new ArrayList<Creature>(); // Initialize the ArrayList
+    creatures = new ArrayList<Creature>();
   }
 
   void run() 
   {
-    for (Creature c : creatures) 
+    for (Creature creature : creatures) 
     {
-      c.run(creatures);  // Passing the entire list of boids to each boid individually
+      creature.run(creatures);
+      
+      if(creature.affect == 1)
+      {
+        avgPositionX = avgPositionX + creature.position.x;
+      }
     }
   }
 
-  void addCreature(Creature c) 
+  void addCreature(Creature creature) 
   {
-    creatures.add(c);
+    creatures.add(creature);
   }
 }

@@ -14,9 +14,10 @@ class Creature
   float size = 10.0;
   float maxForce = 0.03;    
   float maxSpeed = 3; 
+  int affect;
   boolean normalMovement = true;
 
-  Creature(float x, float y) 
+  Creature(float x, float y, int tempAffect) 
   {
     position = new PVector(x, y);
     
@@ -25,12 +26,14 @@ class Creature
     float angle = random(TWO_PI);
     
     velocity = new PVector(cos(angle), sin(angle));
+    
+    affect = tempAffect;
   }
 
   void run(ArrayList<Creature> creatures) 
   {
     group(creatures);
-    update(creatures);
+    update();
     screenEdge();
     draw();
   }
@@ -55,7 +58,7 @@ class Creature
     applyForce(cohesion);
   }
 
-  void update(ArrayList<Creature> creatures) 
+  void update() 
   {
     velocity.add(acceleration);
     
@@ -151,8 +154,6 @@ class Creature
       PVector steer = new PVector(0, 0, 0);
       int count = 0;
       
-      //if(normalMovement == true)
-      //{
         for (Creature nearbyCreature : creatures) 
         {
           float currentSeperation = PVector.dist(position, nearbyCreature.position);
@@ -181,7 +182,6 @@ class Creature
           steer.sub(velocity);
           steer.limit(maxForce);
         }
-      //}
       return steer;
     }
   
@@ -191,8 +191,6 @@ class Creature
       PVector sum = new PVector(0, 0);
       int count = 0;
       
-      //if(normalMovement == true)
-      //{
         for (Creature nearbyCreature : creatures) 
         {
           float currentSeperation = PVector.dist(position, nearbyCreature.position);
@@ -204,7 +202,6 @@ class Creature
             count++;
           }
         }
-      //}
       
       if (count > 0) 
       {
@@ -230,8 +227,6 @@ class Creature
       PVector sum = new PVector(0, 0);
       int count = 0;
       
-      //if(normalMovement == true)
-      //{
         for (Creature nearbyCreature : creatures) 
         {
           float currentSeperation = PVector.dist(position, nearbyCreature.position);
@@ -243,7 +238,6 @@ class Creature
             count++;
           }
         }
-      //}
       
       if (count > 0) 
       {
