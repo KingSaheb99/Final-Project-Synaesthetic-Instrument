@@ -1,5 +1,5 @@
-//Flocking Example
-//Minim getSetBalance Example
+//Flocking
+//Minim getSetBalance
 
 class Group 
 {

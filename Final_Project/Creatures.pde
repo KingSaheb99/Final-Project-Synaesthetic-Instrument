@@ -1,4 +1,4 @@
-//Flocking Example
+//Flocking
 
 class Creature 
 {

@@ -1,6 +1,10 @@
-//Minim BandPassFilter Example
-//Minim getSetBalance Example
-//Minim getSetGain Example
+//Minim BandPassFilter
+//Minim getSetBalance
+//Minim getSetGain
+//Minim FrequencyEnergyBeatDetection
+
+BeatDetect beatDetector;
+int rectTimeout = 0;
 
 void minimFunctions()
 {
@@ -34,5 +38,42 @@ void minimFunctions()
     text("Gain: " + output.getGain(), 5, 60);
   }
   
+  float rectW = width / beatDetector.detectSize();
+  for(int i = 0; i < beatDetector.detectSize(); ++i)
+  {
+    // test one frequency band for an onset
+    if ( beatDetector.isOnset(i)) //&& millis() > rectTimeout)
+    {
+      //rectMode(CENTER);
+      //fill(0,200,0);
+      //rect(width/2, height/2, width/2, height/2);
+      
+      //rectTimeout = millis() + rectTimeout;
+    }
+  }
   
+  
+}
+
+class BeatListener implements AudioListener
+{
+  private BeatDetect beatDetector;
+  private AudioPlayer source;
+  
+  BeatListener(BeatDetect beatDetector, AudioPlayer source)
+  {
+    this.source = source;
+    this.source.addListener(this);
+    this.beatDetector = beatDetector;
+  }
+  
+  void samples(float[] samps)
+  {
+    beatDetector.detect(source.mix);
+  }
+  
+  void samples(float[] sampsL, float[] sampsR)
+  {
+    beatDetector.detect(source.mix);
+  }
 }

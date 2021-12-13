@@ -1,14 +1,18 @@
-//Flocking Example
-//Minim BandPassFilter Example
+//Flocking
+//Minim BandPassFilter
 
 import ddf.minim.*;
 import ddf.minim.effects.*;
 import ddf.minim.ugens.*;
+import ddf.minim.*;
+import ddf.minim.analysis.*;
 
 Minim minim;
 AudioOutput output;
 FilePlayer player;
+AudioPlayer player2;
 BandPass bandPass;
+BeatListener beatListener;
 
 Group group;
 
@@ -26,11 +30,20 @@ void setup()
   output = minim.getLineOut(Minim.STEREO, 1024);
   
   player = new FilePlayer(minim.loadFileStream("Le KAISER Has Arrived.mp3"));
+  player2 = minim.loadFile("Le KAISER Has Arrived.mp3", 1024);
   
   bandPass = new BandPass(440, 400, output.sampleRate());
   
   player.patch(bandPass).patch(output);
   player.loop();
+  
+  player2.loop();
+  player2.mute();
+  
+  beatDetector = new BeatDetect(player2.bufferSize(), player2.sampleRate());
+  beatDetector.setSensitivity(750);
+  
+  beatListener = new BeatListener(beatDetector, player2);
     
   group = new Group();
   
