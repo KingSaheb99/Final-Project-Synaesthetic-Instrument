@@ -8,7 +8,7 @@ The program takes the values of all the creatures that influence a specific trai
 
 New Code Elements:
 - Using flocking is new, the concept was mentioned in class but we were not taught anything related as to how to accomplish it. For this, elements of Processing examples were used.
-- Using the Minim library in general. We began using minim but the professor changed to using the Processing Sound Library very woon after introducing minim for the first time. Thus, much of the use of minim was through reviewing examples and referencing the reference.
+- Using the Minim library in general. We began using minim but the professor changed to using the Processing Sound Library very soon after introducing minim for the first time. Thus, much of the use of minim was through reviewing examples and referencing the reference.
 - Using a band-pass filter and having it change based on the each creatures' elements
 - Creating audio balance (like panning mono audio but in stereo) and having it be controlled by the creatures
 - Using sound beat detection
