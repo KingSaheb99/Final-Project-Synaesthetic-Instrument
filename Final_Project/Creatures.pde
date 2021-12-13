@@ -31,7 +31,11 @@ class Creature
     
     if(affect == 1)
     {
-      passCounter = passCounter + 1;
+      counter_bandPass = counter_bandPass + 1;
+    }
+    else if(affect == 2)
+    {
+      counter_balance = counter_balance + 1;
     }
   }
 
